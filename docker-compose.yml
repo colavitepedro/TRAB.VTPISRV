@@ -1,0 +1,61 @@
+services:
+  web:
+    build: .
+    container_name: operacao-alfa-web
+    ports:
+      - "80:80"
+    environment:
+      MYSQL_HOST: mysql-db
+      MYSQL_DATABASE: usuarios_db
+      MYSQL_USER: usuarios_user
+      MYSQL_PASSWORD: senha_da_nasa
+      POSTGRES_HOST: postgres-db
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: certificados_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: senha_da_nasa
+    depends_on:
+      - mysql-db
+      - postgres-db
+    restart: unless-stopped
+    networks:
+      - alfa-net
+
+  mysql-db:
+    image: mysql:8.0
+    container_name: operacao-alfa-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: senha_da_nasa
+      MYSQL_DATABASE: usuarios_db
+      MYSQL_USER: usuarios_user
+      MYSQL_PASSWORD: senha_da_nasa
+    volumes:
+      - mysql-data:/var/lib/mysql
+    restart: unless-stopped
+    networks:
+      - alfa-net
+
+  postgres-db:
+    image: postgres:14
+    container_name: operacao-alfa-postgres
+    environment:
+      POSTGRES_DB: certificados_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: senha_da_nasa
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - alfa-net
+
+networks:
+  alfa-net:
+    driver: bridge
+
+volumes:
+  mysql-data:
+    driver: local
+  postgres-data:
+    driver: local
